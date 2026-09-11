@@ -15,7 +15,7 @@ app.secret_key = 'mirch_secreto_super_seguro'
 # CONTRASEÑA DE TU PANEL (Puedes cambiar 'mi_password123' por la clave que tú quieras)
 ADMIN_PASSWORD = 'mi_password123'
 
-ARCHIVO_ENLACES = '/home/mirchhub/mysite/enlaces.json'
+ARCHIVO_ENLACES = 'enlaces.json'
 
 def cargar_enlaces():
     try:
@@ -59,6 +59,8 @@ def login():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login - Mirch Hub</title>
+        <!-- Anuncio Push Monetag -->
+        <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <style>
             body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 60px; }}
             .card {{ background: #161b22; padding: 30px; border-radius: 10px; display: inline-block; border: 1px solid #30363d; max-width: 400px; width: 100%; box-sizing: border-box; }}
@@ -96,7 +98,7 @@ def panel_admin():
         if url_acortada:
             codigo_nuevo = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
             guardar_enlace(codigo_nuevo, url_acortada)
-            enlace_generado = f"https://mirchhub.pythonanywhere.com/ver/{{codigo_nuevo}}"
+            enlace_generado = f"https://mirchservice.xyz/ver/{{codigo_nuevo}}"
             mensaje = "¡Enlace registrado con éxito!"
 
     enlaces = cargar_enlaces()
@@ -104,7 +106,7 @@ def panel_admin():
     # Construimos la tabla con el historial de enlaces
     filas_tabla = ""
     for codigo, url in list(enlaces.items()):
-        link_completo = f"https://mirchhub.pythonanywhere.com/ver/{{codigo}}"
+        link_completo = f"https://mirchservice.xyz/ver/{{codigo}}"
         filas_tabla += f"""
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #30363d; font-family: monospace; color: #7ee787;">/ver/{{codigo}}</td>
@@ -123,6 +125,8 @@ def panel_admin():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Panel Admin - Mirch Hub</title>
+        <!-- Anuncio Push Monetag -->
+        <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <style>
             body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 20px; }}
             .container {{ max-width: 700px; margin: 0 auto; }}
@@ -184,4 +188,4 @@ def panel_admin():
     </html>
     """
     return html_resultado
-          
+    
