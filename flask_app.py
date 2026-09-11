@@ -1,6 +1,4 @@
-import json
 import random
-import os
 import string
 from flask import Flask, redirect, render_template_string, request, session, url_for, send_from_directory
 
@@ -13,28 +11,8 @@ def serve_sw():
 app.secret_key = 'mirch_secreto_super_seguro'
 ADMIN_PASSWORD = 'mi_password123'
 
-# Usamos una ruta absoluta basada en la carpeta actual del script
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ARCHIVO_ENLACES = os.path.join(BASE_DIR, 'enlaces.json')
-
-def cargar_enlaces():
-    if not os.path.exists(ARCHIVO_ENLACES):
-        return {}
-    try:
-        with open(ARCHIVO_ENLACES, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error al cargar: {e}")
-        return {}
-
-def guardar_enlace(codigo, url):
-    enlaces = cargar_enlaces()
-    enlaces[codigo] = url
-    try:
-        with open(ARCHIVO_ENLACES, 'w', encoding='utf-8') as f:
-            json.dump(enlaces, f, indent=4, ensure_ascii=False)
-    except Exception as e:
-        print(f"Error al guardar: {e}")
+# Diccionario en memoria para guardar los enlaces sin usar archivos locales
+ENLACES_DB = {}
 
 @app.route('/')
 def inicio():
@@ -43,8 +21,7 @@ def inicio():
 # RUTA DEL ACORTADOR CON CONTADOR Y CLICS DE MONETAG
 @app.route('/ver/<codigo>')
 def ver_hub(codigo):
-    enlaces = cargar_enlaces()
-    destino_real = enlaces.get(codigo, 'https://google.com')
+    destino_real = ENLACES_DB.get(codigo, 'https://google.com')
     
     html_acortador = f"""
     <!DOCTYPE html>
@@ -181,14 +158,12 @@ def panel_admin():
         url_acortada = request.form.get('url')
         if url_acortada:
             codigo_nuevo = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-            guardar_enlace(codigo_nuevo, url_acortada)
+            ENLACES_DB[codigo_nuevo] = url_acortada
             enlace_generado = f"https://mirchservice.xyz/ver/{codigo_nuevo}"
             mensaje = "¡Enlace registrado con éxito!"
 
-    enlaces = cargar_enlaces()
-
     filas_tabla = ""
-    for codigo, url in list(enlaces.items()):
+    for codigo, url in list(ENLACES_DB.items()):
         link_completo = f"https://mirchservice.xyz/ver/{codigo}"
         filas_tabla += f"""
         <tr>
