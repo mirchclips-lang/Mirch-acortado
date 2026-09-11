@@ -1,7 +1,7 @@
 import json
 import random
 import string
-from flask import Flask, redirect, render_template, request, session, url_for, send_from_directory
+from flask import Flask, redirect, render_template_string, request, session, url_for, send_from_directory
 
 app = Flask(__name__)
 
@@ -34,11 +34,93 @@ def guardar_enlace(codigo, url):
 def inicio():
     return redirect('/admin')
 
+# RUTA DEL ACORTADOR CON CONTADOR Y CLICS DE MONETAG
 @app.route('/ver/<codigo>')
 def ver_hub(codigo):
     enlaces = cargar_enlaces()
     destino_real = enlaces.get(codigo, 'https://google.com')
-    return render_template('mirch_acortador.html', enlace_destino=destino_real)
+    
+    html_acortador = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Continuar a tu enlace - Mirch Hub</title>
+        <!-- Anuncio Push Monetag -->
+        <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+        <style>
+            body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 50px; }}
+            .card {{ background: #161b22; padding: 30px; border-radius: 10px; border: 1px solid #30363d; display: inline-block; max-width: 450px; width: 100%; box-sizing: border-box; }}
+            h2 {{ color: #58a6ff; margin-top: 0; }}
+            .btn {{ background: #238636; color: #fff; padding: 14px 20px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; text-decoration: none; display: inline-block; box-sizing: border-box; margin-top: 15px; }}
+            .btn:hover {{ background: #2ea043; }}
+            .contador {{ font-size: 24px; font-weight: bold; color: #7ee787; margin: 20px 0; }}
+            .info {{ color: #8b949e; font-size: 13px; margin-top: 15px; }}
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h2>Preparando tu enlace</h2>
+            <p>Por favor, espera unos segundos para continuar...</p>
+            
+            <div id="contador-box">
+                <div class="contador" id="timer">5</div>
+            </div>
+
+            <!-- Botón de continuar que abrirá la publicidad de Monetag -->
+            <button id="btnContinuar" class="btn" style="display:none;" onclick="manejarClic()">Esperando...</button>
+            
+            <div class="info" id="info-clicks">Completa los pasos para desbloquear tu destino.</div>
+        </div>
+
+        <script>
+            const urlPublicidad = "https://omg10.com/4/11770422";
+            const enlaceDestino = "{destino_real}";
+            
+            let clicsRequeridos = 3; // Número de veces que el usuario debe dar clic
+            let clicsActuales = 0;
+            
+            let segundos = 5;
+            const timerElement = document.getElementById('timer');
+            const contadorBox = document.getElementById('contador-box');
+            const btn = document.getElementById('btnContinuar');
+            const infoClicks = document.getElementById('info-clicks');
+
+            let cuentaRegresiva = setInterval(function() {{
+                segundos--;
+                if (segundos > 0) {{
+                    timerElement.innerText = segundos;
+                }} else {{
+                    clearInterval(cuentaRegresiva);
+                    contadorBox.style.display = "none";
+                    btn.style.display = "block";
+                    btn.innerText = "Continuar (" + (clicsRequeridos - clicsActuales) + " restantes)";
+                }}
+            }}, 1000);
+
+            function manejarClic() {{
+                clicsActuales++;
+                window.open(urlPublicidad, '_blank');
+
+                if (clicsActuales < clicsRequeridos) {{
+                    let restantes = clicsRequeridos - clicsActuales;
+                    btn.innerText = "Continuar (" + restantes + " restantes)";
+                    infoClicks.innerText = "Faltan " + restantes + " pasos para desbloquear.";
+                }} else {{
+                    btn.innerText = "¡Redirigiendo...";
+                    btn.style.background = "#1f6feb";
+                    infoClicks.innerText = "¡Listo! Abriendo tu destino...";
+                    setTimeout(function() {{
+                        window.location.href = enlaceDestino;
+                    }}, 1000);
+                }}
+            }}
+        </script>
+    </body>
+    </html>
+    """
+    return render_template_string(html_acortador)
 
 # PANTALLA DE LOGIN PARA EL ADMIN
 @app.route('/login', methods=['GET', 'POST'])
@@ -188,4 +270,3 @@ def panel_admin():
     </html>
     """
     return html_resultado
-    
