@@ -11,14 +11,12 @@ def serve_sw():
 app.secret_key = 'mirch_secreto_super_seguro'
 ADMIN_PASSWORD = 'mi_password123'
 
-# Diccionario en memoria para guardar los enlaces sin usar archivos locales
 ENLACES_DB = {}
 
 @app.route('/')
 def inicio():
     return redirect('/admin')
 
-# RUTA DEL ACORTADOR CON CONTADOR Y CLICS DE MONETAG
 @app.route('/ver/<codigo>')
 def ver_hub(codigo):
     destino_real = ENLACES_DB.get(codigo, 'https://google.com')
@@ -30,8 +28,7 @@ def ver_hub(codigo):
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Continuar a tu enlace - Mirch Hub</title>
-        <!-- Anuncio Push Monetag -->
-        <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+        <script>(function(s){{s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'}})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <style>
             body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 50px; }}
             .card {{ background: #161b22; padding: 30px; border-radius: 10px; border: 1px solid #30363d; display: inline-block; max-width: 450px; width: 100%; box-sizing: border-box; }}
@@ -51,7 +48,6 @@ def ver_hub(codigo):
                 <div class="contador" id="timer">5</div>
             </div>
 
-            <!-- Botón de continuar que abrirá la publicidad de Monetag -->
             <button id="btnContinuar" class="btn" style="display:none;" onclick="manejarClic()">Esperando...</button>
             
             <div class="info" id="info-clicks">Completa los pasos para desbloquear tu destino.</div>
@@ -123,7 +119,7 @@ def login():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login - Mirch Hub</title>
-        <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+        <script>(function(s){{s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'}})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <style>
             body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 60px; }}
             .card {{ background: #161b22; padding: 30px; border-radius: 10px; display: inline-block; border: 1px solid #30363d; max-width: 400px; width: 100%; box-sizing: border-box; }}
@@ -183,7 +179,7 @@ def panel_admin():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Panel Admin - Mirch Hub</title>
-        <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+        <script>(function(s){{s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'}})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <style>
             body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 20px; }}
             .container {{ max-width: 700px; margin: 0 auto; }}
