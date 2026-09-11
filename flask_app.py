@@ -10,28 +10,31 @@ app = Flask(__name__)
 def serve_sw():
     return send_from_directory('.', 'sw.js')
 
-# Clave secreta necesaria para manejar sesiones seguras en Flask
 app.secret_key = 'mirch_secreto_super_seguro'
-
-# CONTRASEÑA DE TU PANEL
 ADMIN_PASSWORD = 'mi_password123'
 
-ARCHIVO_ENLACES = 'enlaces.json'
+# Usamos una ruta absoluta basada en la carpeta actual del script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ARCHIVO_ENLACES = os.path.join(BASE_DIR, 'enlaces.json')
 
 def cargar_enlaces():
     if not os.path.exists(ARCHIVO_ENLACES):
         return {}
     try:
-        with open(ARCHIVO_ENLACES, 'r') as f:
+        with open(ARCHIVO_ENLACES, 'r', encoding='utf-8') as f:
             return json.load(f)
-    except:
+    except Exception as e:
+        print(f"Error al cargar: {e}")
         return {}
 
 def guardar_enlace(codigo, url):
     enlaces = cargar_enlaces()
     enlaces[codigo] = url
-    with open(ARCHIVO_ENLACES, 'w') as f:
-        json.dump(enlaces, f, indent=4)
+    try:
+        with open(ARCHIVO_ENLACES, 'w', encoding='utf-8') as f:
+            json.dump(enlaces, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"Error al guardar: {e}")
 
 @app.route('/')
 def inicio():
@@ -125,7 +128,6 @@ def ver_hub(codigo):
     """
     return render_template_string(html_acortador)
 
-# PANTALLA DE LOGIN PARA EL ADMIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = ""
@@ -144,7 +146,6 @@ def login():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login - Mirch Hub</title>
-        <!-- Anuncio Push Monetag -->
         <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <style>
             body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 60px; }}
@@ -168,7 +169,6 @@ def login():
     </html>
     """
 
-# PANEL DE CONTROL CON HISTORIAL Y SEGURIDAD
 @app.route('/admin', methods=['GET', 'POST'])
 def panel_admin():
     if not session.get('autenticado'):
@@ -208,7 +208,6 @@ def panel_admin():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Panel Admin - Mirch Hub</title>
-        <!-- Anuncio Push Monetag -->
         <script>(function(s){s.dataset.zone='11770371',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <style>
             body {{ font-family: sans-serif; background: #0d1117; color: #c9d1d9; text-align: center; padding: 20px; }}
