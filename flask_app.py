@@ -1,5 +1,6 @@
 import json
 import random
+import os
 import string
 from flask import Flask, redirect, render_template_string, request, session, url_for, send_from_directory
 
@@ -12,12 +13,14 @@ def serve_sw():
 # Clave secreta necesaria para manejar sesiones seguras en Flask
 app.secret_key = 'mirch_secreto_super_seguro'
 
-# CONTRASEÑA DE TU PANEL (Puedes cambiar 'mi_password123' por la clave que tú quieras)
+# CONTRASEÑA DE TU PANEL
 ADMIN_PASSWORD = 'mi_password123'
 
 ARCHIVO_ENLACES = 'enlaces.json'
 
 def cargar_enlaces():
+    if not os.path.exists(ARCHIVO_ENLACES):
+        return {}
     try:
         with open(ARCHIVO_ENLACES, 'r') as f:
             return json.load(f)
@@ -78,7 +81,7 @@ def ver_hub(codigo):
             const urlPublicidad = "https://omg10.com/4/11770422";
             const enlaceDestino = "{destino_real}";
             
-            let clicsRequeridos = 3; // Número de veces que el usuario debe dar clic
+            let clicsRequeridos = 3; 
             let clicsActuales = 0;
             
             let segundos = 5;
@@ -159,7 +162,7 @@ def login():
                 <input type="password" name="password" placeholder="Contraseña de Administrador" required>
                 <button type="submit">Entrar al Panel</button>
             </form>
-            <div class="error">{{error}}</div>
+            <div class="error">{error}</div>
         </div>
     </body>
     </html>
@@ -168,7 +171,6 @@ def login():
 # PANEL DE CONTROL CON HISTORIAL Y SEGURIDAD
 @app.route('/admin', methods=['GET', 'POST'])
 def panel_admin():
-    # Si no ha iniciado sesión, lo mandamos al login
     if not session.get('autenticado'):
         return redirect('/login')
 
@@ -180,20 +182,19 @@ def panel_admin():
         if url_acortada:
             codigo_nuevo = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
             guardar_enlace(codigo_nuevo, url_acortada)
-            enlace_generado = f"https://mirchservice.xyz/ver/{{codigo_nuevo}}"
+            enlace_generado = f"https://mirchservice.xyz/ver/{codigo_nuevo}"
             mensaje = "¡Enlace registrado con éxito!"
 
     enlaces = cargar_enlaces()
 
-    # Construimos la tabla con el historial de enlaces
     filas_tabla = ""
     for codigo, url in list(enlaces.items()):
-        link_completo = f"https://mirchservice.xyz/ver/{{codigo}}"
+        link_completo = f"https://mirchservice.xyz/ver/{codigo}"
         filas_tabla += f"""
         <tr>
-            <td style="padding: 10px; border-bottom: 1px solid #30363d; font-family: monospace; color: #7ee787;">/ver/{{codigo}}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #30363d; word-break: break-all; color: #8b949e;"><a href="{{url}}" target="_blank" style="color: #58a6ff; text-decoration: none;">{{url}}</a></td>
-            <td style="padding: 10px; border-bottom: 1px solid #30363d;"><input type="text" value="{{link_completo}}" readonly style="background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; padding: 5px; border-radius: 3px; font-size: 11px; width: 180px;" onclick="this.select();"></td>
+            <td style="padding: 10px; border-bottom: 1px solid #30363d; font-family: monospace; color: #7ee787;">/ver/{codigo}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #30363d; word-break: break-all; color: #8b949e;"><a href="{url}" target="_blank" style="color: #58a6ff; text-decoration: none;">{url}</a></td>
+            <td style="padding: 10px; border-bottom: 1px solid #30363d;"><input type="text" value="{link_completo}" readonly style="background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; padding: 5px; border-radius: 3px; font-size: 11px; width: 180px;" onclick="this.select();"></td>
         </tr>
         """
 
@@ -239,9 +240,9 @@ def panel_admin():
     if mensaje:
         html_resultado += f"""
                 <div class="result">
-                    <strong>{{mensaje}}</strong><br><br>
+                    <strong>{mensaje}</strong><br><br>
                     Copia este enlace para tus videos/Telegram:<br>
-                    <div class="link-box">{{enlace_generado}}</div>
+                    <div class="link-box">{enlace_generado}</div>
                 </div>
         """
 
@@ -270,3 +271,6 @@ def panel_admin():
     </html>
     """
     return html_resultado
+
+if __name__ == '__main__':
+    app.run(debug=True)
